@@ -3,14 +3,15 @@
 // Definitions by: Tim Jackson-Kiely <https://github.com/timjk>
 //                 Liam Ross <https://github.com/liamross>
 //                 Michael Mok <https://github.com/pmmmwh>
+//                 Hannes Diercks <https://github.com/Xiphe>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
 declare namespace Polyglot {
-    interface InterpolationOptions {
+    type InterpolationOptions<InterpolationValue = any> = {
         smart_count?: number | { length: number } | undefined;
         _?: string | undefined;
-
-        [interpolationKey: string]: any;
+    } & {
+        [interpolationKey: string]: InterpolationValue;
     }
 
     interface InterpolationTokenOptions {
@@ -23,25 +24,26 @@ declare namespace Polyglot {
         pluralTypeToLanguages: {[lang: string]: string[]};
     }
 
-    interface PolyglotOptions {
+    interface PolyglotOptions<InterpolationValue = any, ReplaceResult = string> {
         phrases?: any;
         locale?: string | undefined;
         allowMissing?: boolean | undefined;
-        onMissingKey?: ((key: string, options: Polyglot.InterpolationOptions, locale: string) => string) | undefined;
+        onMissingKey?: ((key: string, options: Polyglot.InterpolationOptions<InterpolationValue>, locale: string) => string) | undefined;
         warn?: ((message: string) => void) | undefined;
         interpolation?: InterpolationTokenOptions | undefined;
         pluralRules?: PluralRules | undefined;
+        replace?: (this: string, interpolationRegex: RegExp, replacer: (wholeMatch: string, param: string) => InterpolationValue) => ReplaceResult;
     }
 
     function transformPhrase(phrase: string, options?: number | Polyglot.InterpolationOptions, locale?: string): string;
 }
 
-declare class Polyglot {
-    constructor(options?: Polyglot.PolyglotOptions);
+declare class Polyglot<InterpolationValue = any, ReplaceResult = string> {
+    constructor(options?: Polyglot.PolyglotOptions<InterpolationValue, ReplaceResult>);
 
     extend(phrases: any, prefix?: string): void;
 
-    t(phrase: string, options?: number | Polyglot.InterpolationOptions): string;
+    t(phrase: string, options?: number | Polyglot.InterpolationOptions<InterpolationValue>): ReplaceResult;
 
     clear(): void;
 

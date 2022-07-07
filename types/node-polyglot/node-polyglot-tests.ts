@@ -39,6 +39,23 @@ function instantiatePolyglot(): void {
             }
         }
     });
+    var customInterpolationPolyglot = new Polyglot({
+        replace: function(rgx, cb) {
+            var match = this.match(rgx)
+            return { custom: cb(match[0], match[1]) }
+        }
+    })
+    // @ts-expect-error
+    var value = customInterpolationPolyglot.t('key').nope
+    var value = customInterpolationPolyglot.t('key').custom
+    var customTypedInterpolationPolyglot = new Polyglot<{ param: string}, { result: string }>({
+        replace: function(rgx, cb) {
+            var match = this.match(rgx)
+            // @ts-expect-error
+            var value = cb(match[0], match[1]).nope
+            return { result: cb(match[0], match[1]).param }
+        }
+    })
 }
 
 function translate(): void {
